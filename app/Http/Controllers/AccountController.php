@@ -32,7 +32,7 @@ class AccountController extends Controller
         ]);
 
         if ($request->age < 18) {
-            return back()->with('warning', 'Minors aren\'t allowed to register');
+            return back()->with('warning', 'Minors arent allowed to register');
         }
     
         // Create the user if all validation passes and the age is valid

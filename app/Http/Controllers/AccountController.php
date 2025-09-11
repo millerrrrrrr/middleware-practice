@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
@@ -18,7 +19,40 @@ class AccountController extends Controller
         return view('auth.register');
     }
 
-    public function loginPost() {}
+    public function loginPost(Request $request) {
+
+        // Validate the input fields
+    $request->validate([
+        'username' => 'required',
+        'password' => 'required',
+    ]);
+
+    // Get the credentials from the request
+    $creds = $request->only('username', 'password');
+
+    // Attempt to authenticate the user with the credentials
+    if (Auth::attempt($creds)) {
+        // Check the authenticated user's role
+        $user = Auth::user();
+        
+        // Redirect based on user role
+        switch ($user->role) {
+            case 'admin':
+                return redirect()->route('adminHome')->with('success', 'Login success');
+            case 'staff':
+                return redirect()->route('staffHome')->with('success', 'Login success');
+            case 'teacher':
+                return redirect()->route('teacherHome')->with('success', 'Login success');
+            default:
+                // Default redirection (if user has no valid role)
+                return redirect()->route('home')->with('success', 'Login success');
+        }
+    }
+
+    // If authentication fails, return to the login page with an error message
+    return back()->with('error', 'Login failed');
+
+    }
 
     public function registerPost(Request $request)
     {
